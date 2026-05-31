@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Urna Eletrônica</title>
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; font-family: Arial, sans-serif; }
+    body {
+      background:#d9d9d9;
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .urna {
+      width:1000px;
+      height:580px;
+      background:#f4f4f4;
+      border-radius:20px;
+      box-shadow:0 0 30px rgba(0,0,0,.2);
+      overflow:hidden;
+      display:flex;
+    }
+
+    .tela {
+      flex:1;
+      background:#fff;
+      padding:20px;
+      position:relative;
+    }
+
+    .mensagem {
+      background:#ffe082;
+      border:2px solid #d4af37;
+      padding:10px;
+      border-radius:10px;
+      font-weight:bold;
+      margin-bottom:15px;
+      display:none;
+    }
+
+    .bloqueada {
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      height:100%;
+      text-align:center;
+    }
+
+    .cadeado { font-size:90px; }
+
+    .senha {
+      margin-top:20px;
+      font-size:32px;
+      width:180px;
+      text-align:center;
+      padding:10px;
+      letter-spacing:10px;
+    }
+
+    .cargo { font-size:30px; margin-bottom:20px; }
+    .numero { font-size:42px; margin:20px 0; letter-spacing:10px; }
+    .candidato img {
+      width:180px;
+      height:220px;
+      object-fit:cover;
+      border:2px solid #ccc;
+    }
+
+    .teclas {
+      width:250px;
+      background:#ddd;
+      border-left:2px solid #bbb;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      padding:20px;
+      gap:8px;
+    }
+
+    .info-teclas {
+      background:#fff;
+      padding:10px;
+      border-radius:8px;
+      font-weight:bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="urna">
+  <div class="tela">
+
+    <div id="mensagem" class="mensagem"></div>
+
+    <div id="bloqueada" class="bloqueada">
+      <div class="cadeado">🔒</div>
+      <h1>URNA BLOQUEADA</h1>
+      <p>DIGITE A SENHA VERIFICADORA DO SISTEMA</p>
+      <div style="font-size:50px;margin-top:10px;">🔐</div>
+
+      <input
+        id="senha"
+        class="senha"
+        maxlength="4"
+        readonly
+        inputmode="none"
+      />
+    </div>
+
+    <div id="urnaArea" style="display:none;">
+      <div class="cargo" id="cargoNome"></div>
+      <div class="numero" id="numeroDigitado">__</div>
+
+      <div class="candidato" id="dadosCandidato"></div>
+    </div>
+
+  </div>
+
+  <div class="teclas">
+    <div class="info-teclas">
+      ENTER = CONFIRMAR<br>
+      . = CORRIGE<br>
+      BACKSPACE = APAGAR
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBS9T8rTIa_xDTX0TYrXx27GosNnnKQZgQ",
+  authDomain: "urna-digitall.firebaseapp.com",
+  projectId: "urna-digitall",
+  storageBucket: "urna-digitall.firebasestorage.app",
+  messagingSenderId: "483657741450",
+  appId: "1:483657741450:web:4b1dc7da83fe2730f2a973"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const senhaInput = document.getElementById('senha');
+const bloqueada = document.getElementById('bloqueada');
+const urnaArea = document.getElementById('urnaArea');
+const mensagem = document.getElementById('mensagem');
+
+let senhaDigitada = '';
+let urnaLiberada = false;
+
+// Escuta sistema em tempo real
+onSnapshot(doc(db, 'sistema', 'controle'), async (snap) => {
+  const data = snap.data();
+  if (!data) return;
+
+  if (data.travada === true) {
+    urnaLiberada = false;
+    bloqueada.style.display = 'flex';
+    urnaArea.style.display = 'none';
+    senhaDigitada = '';
+    senhaInput.value = '';
+  }
+
+  if (data.mensagem) {
+    mensagem.style.display = 'block';
+    mensagem.textContent = data.mensagem;
+  } else {
+    mensagem.style.display = 'none';
+  }
+});
+
+// Teclado físico
+window.addEventListener('keydown', async (e) => {
+  if (!urnaLiberada) {
+    if (/^[0-9]$/.test(e.key)) {
+      if (senhaDigitada.length < 4) {
+        senhaDigitada += e.key;
+        senhaInput.value = senhaDigitada;
+      }
+    }
+
+    if (e.key === 'Backspace') {
+      senhaDigitada = senhaDigitada.slice(0, -1);
+      senhaInput.value = senhaDigitada;
+    }
+
+    if (senhaDigitada.length === 4) {
+      const ref = await getDoc(doc(db, 'sistema', 'controle'));
+      const dados = ref.data();
+
+      if (dados.codigo === senhaDigitada) {
+        urnaLiberada = true;
+        bloqueada.style.display = 'none';
+        urnaArea.style.display = 'block';
+
+        iniciarCamera();
+      } else {
+        senhaDigitada = '';
+        senhaInput.value = '';
+        alert('Senha inválida');
+      }
+    }
+  }
+});
+
+// CAMERA WEBRTC (base)
+async function iniciarCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false
+    });
+
+    console.log('Camera iniciada', stream);
+
+    // Aqui vai entrar a lógica WebRTC
+    // conectando com verificador.html
+
+  } catch (err) {
+    console.error(err);
+    alert('Permita o acesso à câmera da urna');
+  }
+}
+</script>
+
+</body>
+</html>
