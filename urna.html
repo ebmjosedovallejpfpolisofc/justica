@@ -3,16 +3,836 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Urna</title>
+<title>Urna Eletrônica</title>
+
 <style>
-body{font-family:Arial;background:#ddd;display:flex;justify-content:center;align-items:center;height:100vh;margin:0}
-.box{width:900px;height:500px;background:#fff;border-radius:20px;padding:20px}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#d7d7d7;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.urna{
+    width:1000px;
+    height:580px;
+    background:#ece8df;
+    border-radius:20px;
+    display:flex;
+    overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,.2);
+}
+
+.tela{
+    flex:1;
+    background:white;
+    padding:25px;
+    position:relative;
+}
+
+.lateral{
+    width:240px;
+    background:#ddd;
+    border-left:2px solid #bbb;
+    padding:20px;
+}
+
+.alerta{
+    background:#ffe082;
+    border:2px solid #e0b400;
+    border-radius:12px;
+    padding:12px;
+    font-weight:bold;
+    margin-bottom:15px;
+    display:none;
+}
+
+.bloqueada,
+.matricula-screen,
+.votacao-screen,
+.final-screen{
+    display:none;
+    width:100%;
+    height:100%;
+}
+
+.active{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.cadeado{
+    font-size:85px;
+}
+
+h1{
+    margin-top:15px;
+    text-align:center;
+}
+
+.input-codigo,
+.input-matricula{
+    width:220px;
+    height:70px;
+    font-size:36px;
+    text-align:center;
+    margin-top:25px;
+    border:3px solid #333;
+    border-radius:12px;
+    letter-spacing:12px;
+}
+
+.cargo{
+    font-size:34px;
+    font-weight:bold;
+}
+
+.numero{
+    margin-top:30px;
+    font-size:50px;
+    letter-spacing:12px;
+}
+
+.candidato{
+    margin-top:20px;
+    display:flex;
+    gap:20px;
+    align-items:center;
+}
+
+.candidato img{
+    width:180px;
+    height:220px;
+    object-fit:cover;
+    border:2px solid #bbb;
+}
+
+.nomeCand{
+    font-size:32px;
+    font-weight:bold;
+}
+
+.partido{
+    margin-top:8px;
+    font-size:24px;
+}
+
+.instrucao{
+    margin-top:20px;
+    font-size:22px;
+}
+
+.teclas{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    font-weight:bold;
+}
+
+.erro{
+    color:red;
+    margin-top:12px;
+    font-weight:bold;
+}
 </style>
 </head>
 <body>
-<div class="box">
-<h1>URNA (BASE EXPORTADA)</h1>
-<p>Este arquivo é uma versão exportada para ZIP.</p>
+
+<div class="urna">
+
+<div class="tela">
+
+<div id="mensagem" class="alerta"></div>
+
+<!-- BLOQUEADA -->
+<div id="bloqueada" class="bloqueada active">
+<div class="cadeado">🔒</div>
+
+<h1>
+URNA BLOQUEADA<br>
+DIGITE A SENHA VERIFICADORA
+</h1>
+
+<div style="font-size:50px;margin-top:12px;">
+🔐
 </div>
+
+<input
+id="senhaInput"
+class="input-codigo"
+readonly
+inputmode="none"
+maxlength="4"
+/>
+
+<div id="erroSenha" class="erro"></div>
+</div>
+
+<!-- MATRICULA -->
+<div id="matriculaScreen" class="matricula-screen">
+<h1>DIGITE SUA MATRÍCULA</h1>
+
+<input
+id="matriculaInput"
+class="input-matricula"
+readonly
+inputmode="none"
+/>
+
+<div id="erroMatricula" class="erro"></div>
+</div>
+
+<!-- VOTAÇÃO -->
+<div id="votacaoScreen" class="votacao-screen">
+
+<div class="cargo" id="cargoNome"></div>
+
+<div class="numero" id="numeroDigitado">
+__
+</div>
+
+<div class="candidato" id="dadosCandidato">
+</div>
+
+<div class="instrucao">
+ENTER = CONFIRMAR<br>
+. = CORRIGE<br>
+BACKSPACE = APAGAR
+</div>
+
+</div>
+
+<!-- FINAL -->
+<div id="finalScreen" class="final-screen">
+<h1>VOTO FINALIZADO</h1>
+<h2>Próximo eleitor</h2>
+</div>
+
+</div>
+
+<div class="lateral">
+<div class="teclas">
+ENTER = CONFIRMAR<br><br>
+. = CORRIGE<br><br>
+BACKSPACE = APAGAR
+</div>
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc,
+addDoc,
+collection,
+query,
+where,
+getDocs,
+onSnapshot
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyBS9T8rTIa_xDTX0TYrXx27GosNnnKQZgQ",
+authDomain:"urna-digitall.firebaseapp.com",
+projectId:"urna-digitall",
+storageBucket:"urna-digitall.firebasestorage.app",
+messagingSenderId:"483657741450",
+appId:"1:483657741450:web:4b1dc7da83fe2730f2a973"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const senhaInput =
+document.getElementById("senhaInput");
+
+const matriculaInput =
+document.getElementById("matriculaInput");
+
+const erroSenha =
+document.getElementById("erroSenha");
+
+const erroMatricula =
+document.getElementById("erroMatricula");
+
+const mensagem =
+document.getElementById("mensagem");
+
+const bloqueada =
+document.getElementById("bloqueada");
+
+const matriculaScreen =
+document.getElementById("matriculaScreen");
+
+const votacaoScreen =
+document.getElementById("votacaoScreen");
+
+const finalScreen =
+document.getElementById("finalScreen");
+
+let estado = "senha";
+let senhaDigitada = "";
+let matricula = "";
+let numeroAtual = "";
+let eleicaoId = "";
+let cargos = [];
+let cargoAtualIndex = 0;
+let candidatoAtual = null;
+
+// tempo real
+onSnapshot(
+doc(db,"sistema","controle"),
+(snap)=>{
+
+const d = snap.data();
+
+if(!d) return;
+
+if(d.mensagem){
+mensagem.style.display="block";
+mensagem.textContent=d.mensagem;
+}else{
+mensagem.style.display="none";
+}
+
+if(d.travada===true){
+resetarUrna();
+}
+
+eleicaoId=d.eleicaoAtiva || "";
+
+});
+
+// carregar cargos
+async function carregarCargos(){
+
+if(!eleicaoId) return;
+
+const q = query(
+collection(db,"cargos"),
+where("eleicaoId","==",eleicaoId)
+);
+
+const snap = await getDocs(q);
+
+cargos = [];
+
+snap.forEach(docu=>{
+    cargos.push({
+        id:docu.id,
+        ...docu.data()
+    });
+});
+
+cargos.sort((a,b)=>
+(a.ordem||0)-(b.ordem||0)
+);
+
+cargoAtualIndex = 0;
+
+mostrarCargo();
+}
+
+async function mostrarCargo(){
+
+if(cargoAtualIndex >= cargos.length){
+    finalizarVoto();
+    return;
+}
+
+numeroAtual = "";
+candidatoAtual = null;
+
+const cargo =
+cargos[cargoAtualIndex];
+
+document
+.getElementById("cargoNome")
+.textContent = cargo.nome;
+
+document
+.getElementById("numeroDigitado")
+.textContent =
+"_".repeat(cargo.digitos);
+
+document
+.getElementById("dadosCandidato")
+.innerHTML = "";
+}
+
+async function buscarCandidato(){
+
+const cargo =
+cargos[cargoAtualIndex];
+
+if(
+numeroAtual.length !==
+cargo.digitos
+){
+return;
+}
+
+const q = query(
+collection(db,"candidatos"),
+where("eleicaoId","==",eleicaoId),
+where("cargoId","==",cargo.id),
+where("numero","==",numeroAtual)
+);
+
+const snap =
+await getDocs(q);
+
+if(snap.empty){
+
+candidatoAtual = null;
+
+document
+.getElementById("dadosCandidato")
+.innerHTML =
+`
+<h2 style="color:red">
+CANDIDATO NÃO ENCONTRADO
+</h2>
+`;
+
+return;
+}
+
+const docu =
+snap.docs[0];
+
+candidatoAtual = {
+id:docu.id,
+...docu.data()
+};
+
+document
+.getElementById("dadosCandidato")
+.innerHTML =
+`
+<img src="${
+candidatoAtual.foto || ''
+}">
+
+<div>
+<div class="nomeCand">
+${candidatoAtual.nome}
+</div>
+
+<div class="partido">
+${candidatoAtual.partido || ""}
+</div>
+</div>
+`;
+}
+
+async function confirmarVoto(){
+
+if(!candidatoAtual){
+return;
+}
+
+const cargo =
+cargos[cargoAtualIndex];
+
+await addDoc(
+collection(db,"votos"),
+{
+eleicaoId,
+cargoId:cargo.id,
+cargoNome:cargo.nome,
+candidatoId:
+candidatoAtual.id,
+candidato:
+candidatoAtual.nome,
+numero:
+candidatoAtual.numero,
+matricula,
+timestamp:Date.now()
+}
+);
+
+cargoAtualIndex++;
+
+mostrarCargo();
+}
+
+async function finalizarVoto(){
+
+await setDoc(
+doc(
+db,
+"matriculas",
+matricula
+),
+{
+usada:true,
+eleicaoId,
+timestamp:Date.now()
+}
+);
+
+await setDoc(
+doc(db,
+"sistema",
+"controle"
+),
+{
+mensagem:""
+},
+{
+merge:true
+}
+);
+
+votacaoScreen
+.classList
+.remove("active");
+
+finalScreen
+.classList
+.add("active");
+
+setTimeout(()=>{
+
+finalScreen
+.classList
+.remove("active");
+
+matriculaScreen
+.classList
+.add("active");
+
+matriculaInput
+.value="";
+
+matricula="";
+estado=
+"matricula";
+
+},3000);
+}
+
+function resetarUrna(){
+
+estado = "senha";
+
+senhaDigitada = "";
+matricula = "";
+numeroAtual = "";
+
+senhaInput.value="";
+matriculaInput.value="";
+
+bloqueada
+.classList
+.add("active");
+
+matriculaScreen
+.classList
+.remove("active");
+
+votacaoScreen
+.classList
+.remove("active");
+
+finalScreen
+.classList
+.remove("active");
+}
+
+// teclado físico
+window.addEventListener(
+"keydown",
+async (e)=>{
+
+if(
+/^[0-9]$/
+.test(e.key)
+){
+
+// SENHA
+if(
+estado==="senha"
+){
+
+if(
+senhaDigitada.length<4
+){
+
+senhaDigitada +=
+e.key;
+
+senhaInput.value =
+senhaDigitada;
+}
+
+if(
+senhaDigitada
+.length===4
+){
+
+const snap =
+await getDoc(
+doc(
+db,
+"sistema",
+"controle"
+)
+);
+
+const dados =
+snap.data();
+
+if(
+dados.codigo ===
+senhaDigitada
+){
+
+estado =
+"matricula";
+
+bloqueada
+.classList
+.remove(
+"active"
+);
+
+matriculaScreen
+.classList
+.add(
+"active"
+);
+
+}else{
+
+erroSenha
+.textContent =
+"SENHA INVÁLIDA";
+
+setTimeout(()=>{
+erroSenha
+.textContent="";
+},2000);
+
+senhaDigitada="";
+senhaInput.value="";
+}
+}
+}
+
+// MATRICULA
+else if(
+estado===
+"matricula"
+){
+
+matricula +=
+e.key;
+
+matriculaInput
+.value =
+matricula;
+}
+
+// VOTAÇÃO
+else if(
+estado===
+"votacao"
+){
+
+const cargo =
+cargos[
+cargoAtualIndex
+];
+
+if(
+numeroAtual.length <
+cargo.digitos
+){
+
+numeroAtual +=
+e.key;
+
+document
+.getElementById(
+"numeroDigitado"
+)
+.textContent =
+numeroAtual;
+
+buscarCandidato();
+}
+}
+}
+
+// BACKSPACE
+if(
+e.key==="Backspace"
+){
+
+if(
+estado===
+"matricula"
+){
+
+matricula =
+matricula
+.slice(0,-1);
+
+matriculaInput
+.value=
+matricula;
+}
+
+if(
+estado===
+"votacao"
+){
+
+numeroAtual =
+numeroAtual
+.slice(0,-1);
+
+document
+.getElementById(
+"numeroDigitado"
+)
+.textContent =
+numeroAtual;
+}
+}
+
+// .
+if(
+e.key==="."
+&&
+estado===
+"votacao"
+){
+
+numeroAtual="";
+candidatoAtual=null;
+
+document
+.getElementById(
+"dadosCandidato"
+)
+.innerHTML="";
+
+document
+.getElementById(
+"numeroDigitado"
+)
+.textContent =
+"_".repeat(
+cargos[
+cargoAtualIndex
+]
+.digitos
+);
+}
+
+// ENTER
+if(
+e.key==="Enter"
+){
+
+// confirmar matricula
+if(
+estado===
+"matricula"
+){
+
+const snap =
+await getDoc(
+doc(
+db,
+"matriculas",
+matricula
+)
+);
+
+if(
+snap.exists()
+){
+
+erroMatricula
+.textContent =
+"ESTA MATRÍCULA JÁ FOI UTILIZADA";
+
+return;
+}
+
+estado =
+"votacao";
+
+matriculaScreen
+.classList
+.remove(
+"active"
+);
+
+votacaoScreen
+.classList
+.add(
+"active"
+);
+
+await carregarCargos();
+}
+
+// confirmar voto
+else if(
+estado===
+"votacao"
+){
+confirmarVoto();
+}
+}
+
+});
+
+// iniciar câmera
+try{
+
+const stream =
+await navigator
+.mediaDevices
+.getUserMedia({
+video:true,
+audio:false
+});
+
+console.log(
+"camera iniciada",
+stream
+);
+
+// WebRTC entra aqui
+
+}catch(err){
+console.error(err);
+}
+
+</script>
 </body>
 </html>
