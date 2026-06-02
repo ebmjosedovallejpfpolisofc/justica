@@ -2,148 +2,163 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
 <title>Urna Eletrônica</title>
 
 <style>
+
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
 }
 
 body{
-    background:#d7d7d7;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+background:#d8d8d8;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
 }
 
 .urna{
-    width:1000px;
-    height:580px;
-    background:#ece8df;
-    border-radius:20px;
-    display:flex;
-    overflow:hidden;
-    box-shadow:0 10px 40px rgba(0,0,0,.2);
+width:1000px;
+height:580px;
+background:#ece8df;
+border-radius:20px;
+overflow:hidden;
+display:flex;
+box-shadow:
+0 10px 40px rgba(0,0,0,.25);
 }
 
 .tela{
-    flex:1;
-    background:white;
-    padding:25px;
-    position:relative;
+flex:1;
+background:white;
+padding:25px;
+position:relative;
 }
 
 .lateral{
-    width:240px;
-    background:#ddd;
-    border-left:2px solid #bbb;
-    padding:20px;
+width:240px;
+background:#ddd;
+border-left:2px solid #bbb;
+padding:20px;
+display:flex;
+align-items:flex-end;
+}
+
+.info{
+background:white;
+padding:15px;
+border-radius:12px;
+font-weight:bold;
+width:100%;
 }
 
 .alerta{
-    background:#ffe082;
-    border:2px solid #e0b400;
-    border-radius:12px;
-    padding:12px;
-    font-weight:bold;
-    margin-bottom:15px;
-    display:none;
+background:#ffe082;
+border:2px solid #d8a600;
+padding:12px;
+border-radius:12px;
+font-weight:bold;
+margin-bottom:15px;
+display:none;
 }
 
 .bloqueada,
-.matricula-screen,
-.votacao-screen,
-.final-screen{
-    display:none;
-    width:100%;
-    height:100%;
+.matriculaScreen,
+.votacaoScreen,
+.fimScreen{
+display:none;
+width:100%;
+height:100%;
 }
 
 .active{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
 }
 
 .cadeado{
-    font-size:85px;
+font-size:90px;
 }
 
 h1{
-    margin-top:15px;
-    text-align:center;
+text-align:center;
 }
 
-.input-codigo,
-.input-matricula{
-    width:220px;
-    height:70px;
-    font-size:36px;
-    text-align:center;
-    margin-top:25px;
-    border:3px solid #333;
-    border-radius:12px;
-    letter-spacing:12px;
-}
-
-.cargo{
-    font-size:34px;
-    font-weight:bold;
-}
-
-.numero{
-    margin-top:30px;
-    font-size:50px;
-    letter-spacing:12px;
-}
-
-.candidato{
-    margin-top:20px;
-    display:flex;
-    gap:20px;
-    align-items:center;
-}
-
-.candidato img{
-    width:180px;
-    height:220px;
-    object-fit:cover;
-    border:2px solid #bbb;
-}
-
-.nomeCand{
-    font-size:32px;
-    font-weight:bold;
-}
-
-.partido{
-    margin-top:8px;
-    font-size:24px;
-}
-
-.instrucao{
-    margin-top:20px;
-    font-size:22px;
-}
-
-.teclas{
-    background:white;
-    padding:15px;
-    border-radius:12px;
-    font-weight:bold;
+.inputSenha,
+.inputMatricula{
+width:230px;
+height:70px;
+font-size:36px;
+border:3px solid #333;
+border-radius:12px;
+margin-top:25px;
+text-align:center;
+letter-spacing:12px;
 }
 
 .erro{
-    color:red;
-    margin-top:12px;
-    font-weight:bold;
+color:red;
+font-weight:bold;
+margin-top:12px;
+font-size:18px;
 }
+
+.cargo{
+font-size:34px;
+font-weight:bold;
+}
+
+.numero{
+font-size:54px;
+margin-top:25px;
+letter-spacing:12px;
+}
+
+.candidato{
+margin-top:20px;
+display:flex;
+gap:20px;
+align-items:center;
+}
+
+.candidato img{
+width:180px;
+height:220px;
+object-fit:cover;
+border:2px solid #bbb;
+}
+
+.nomeCand{
+font-size:30px;
+font-weight:bold;
+}
+
+.partido{
+font-size:22px;
+margin-top:10px;
+}
+
+.instrucoes{
+margin-top:25px;
+font-size:22px;
+}
+
+.fimTexto{
+font-size:110px;
+font-weight:bold;
+}
+
 </style>
 </head>
 <body>
@@ -152,59 +167,99 @@ h1{
 
 <div class="tela">
 
-<div id="mensagem" class="alerta"></div>
+<div
+id="mensagem"
+class="alerta">
+</div>
 
 <!-- BLOQUEADA -->
-<div id="bloqueada" class="bloqueada active">
-<div class="cadeado">🔒</div>
+<div
+id="bloqueada"
+class="bloqueada active">
+
+<div class="cadeado">
+🔒
+</div>
 
 <h1>
-URNA BLOQUEADA<br>
-DIGITE A SENHA VERIFICADORA
+URNA BLOQUEADA
 </h1>
 
-<div style="font-size:50px;margin-top:12px;">
+<p>
+DIGITE A SENHA
+VERIFICADORA
+</p>
+
+<div style="
+font-size:50px;
+margin-top:10px;
+">
 🔐
 </div>
 
 <input
 id="senhaInput"
-class="input-codigo"
+class="inputSenha"
 readonly
 inputmode="none"
 maxlength="4"
+autocomplete="off"
 />
 
-<div id="erroSenha" class="erro"></div>
+<div
+id="erroSenha"
+class="erro">
+</div>
+
 </div>
 
 <!-- MATRICULA -->
-<div id="matriculaScreen" class="matricula-screen">
-<h1>DIGITE SUA MATRÍCULA</h1>
+<div
+id="matriculaScreen"
+class="matriculaScreen">
+
+<h1>
+DIGITE SUA
+MATRÍCULA
+</h1>
 
 <input
 id="matriculaInput"
-class="input-matricula"
+class="inputMatricula"
 readonly
 inputmode="none"
+autocomplete="off"
 />
 
-<div id="erroMatricula" class="erro"></div>
+<div
+id="erroMatricula"
+class="erro">
+</div>
+
 </div>
 
 <!-- VOTAÇÃO -->
-<div id="votacaoScreen" class="votacao-screen">
+<div
+id="votacaoScreen"
+class="votacaoScreen">
 
-<div class="cargo" id="cargoNome"></div>
+<div
+id="cargoNome"
+class="cargo">
+</div>
 
-<div class="numero" id="numeroDigitado">
+<div
+id="numeroDigitado"
+class="numero">
 __
 </div>
 
-<div class="candidato" id="dadosCandidato">
+<div
+id="dadosCandidato"
+class="candidato">
 </div>
 
-<div class="instrucao">
+<div class="instrucoes">
 ENTER = CONFIRMAR<br>
 . = CORRIGE<br>
 BACKSPACE = APAGAR
@@ -212,14 +267,12 @@ BACKSPACE = APAGAR
 
 </div>
 
-<!-- FINAL -->
-<div id="finalScreen" class="final-screen">
+<!-- FIM -->
+<div
+id="fimScreen"
+class="fimScreen">
 
-<div style="
-font-size:90px;
-font-weight:bold;
-text-align:center;
-">
+<div class="fimTexto">
 FIM
 </div>
 
@@ -234,19 +287,32 @@ preload="auto">
 </div>
 
 <div class="lateral">
-<div class="teclas">
-ENTER = CONFIRMAR<br><br>
-. = CORRIGE<br><br>
+
+<div class="info">
+
+ENTER = CONFIRMAR
+
+<br><br>
+
+. = CORRIGE
+
+<br><br>
+
 BACKSPACE = APAGAR
+
 </div>
+
 </div>
 
 </div>
 
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {
+initializeApp
+}
+from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
 getFirestore,
@@ -260,218 +326,349 @@ where,
 getDocs,
 onSnapshot
 }
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey:"AIzaSyBS9T8rTIa_xDTX0TYrXx27GosNnnKQZgQ",
-authDomain:"urna-digitall.firebaseapp.com",
-projectId:"urna-digitall",
-storageBucket:"urna-digitall.firebasestorage.app",
-messagingSenderId:"483657741450",
-appId:"1:483657741450:web:4b1dc7da83fe2730f2a973"
+
+apiKey:
+"AIzaSyBS9T8rTIa_xDTX0TYrXx27GosNnnKQZgQ",
+
+authDomain:
+"urna-digitall.firebaseapp.com",
+
+projectId:
+"urna-digitall",
+
+storageBucket:
+"urna-digitall.firebasestorage.app",
+
+messagingSenderId:
+"483657741450",
+
+appId:
+"1:483657741450:web:4b1dc7da83fe2730f2a973"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const app =
+initializeApp(
+firebaseConfig
+);
+
+const db =
+getFirestore(app);
 
 const senhaInput =
-document.getElementById("senhaInput");
+document.getElementById(
+"senhaInput"
+);
 
 const matriculaInput =
-document.getElementById("matriculaInput");
-
-const erroSenha =
-document.getElementById("erroSenha");
-
-const erroMatricula =
-document.getElementById("erroMatricula");
+document.getElementById(
+"matriculaInput"
+);
 
 const mensagem =
-document.getElementById("mensagem");
+document.getElementById(
+"mensagem"
+);
 
 const bloqueada =
-document.getElementById("bloqueada");
+document.getElementById(
+"bloqueada"
+);
 
 const matriculaScreen =
-document.getElementById("matriculaScreen");
+document.getElementById(
+"matriculaScreen"
+);
 
 const votacaoScreen =
-document.getElementById("votacaoScreen");
+document.getElementById(
+"votacaoScreen"
+);
 
-const finalScreen =
-document.getElementById("finalScreen");
+const fimScreen =
+document.getElementById(
+"fimScreen"
+);
 
-let estado = "senha";
-let senhaDigitada = "";
-let matricula = "";
-let numeroAtual = "";
-let eleicaoId = "";
+let estado =
+"senha";
+
+let senhaDigitada =
+"";
+
+let matricula =
+"";
+
+let numeroAtual =
+"";
+
+let eleicaoId =
+"";
+
 let cargos = [];
-let cargoAtualIndex = 0;
-let candidatoAtual = null;
+
+let cargoAtual = 0;
+
+let candidatoAtual =
+null;
 
 // tempo real
 onSnapshot(
 doc(db,"sistema","controle"),
-(snap)=>{
+async (snap)=>{
 
-const d = snap.data();
+const data =
+snap.data();
 
-if(!d) return;
+if(!data) return;
 
-if(d.mensagem){
-mensagem.style.display="block";
-mensagem.textContent=d.mensagem;
+// mensagem
+if(data.mensagem){
+
+mensagem.style.display =
+"block";
+
+mensagem.textContent =
+data.mensagem;
+
 }else{
-mensagem.style.display="none";
+
+mensagem.style.display =
+"none";
 }
 
-if(d.travada===true){
+// eleição ativa
+eleicaoId =
+data.eleicaoAtiva || "";
+
+// travar urna
+if(data.travada === true){
+
 resetarUrna();
 }
-
-eleicaoId=d.eleicaoAtiva || "";
-
 });
 
-// carregar cargos
-async function carregarCargos(){
+async function
+carregarCargos(){
 
-if(!eleicaoId) return;
-
-const q = query(
-collection(db,"cargos"),
-where("eleicaoId","==",eleicaoId)
-);
-
-const snap = await getDocs(q);
-
-cargos = [];
-
-snap.forEach(docu=>{
-    cargos.push({
-        id:docu.id,
-        ...docu.data()
-    });
-});
-
-cargos.sort((a,b)=>
-(a.ordem||0)-(b.ordem||0)
-);
-
-cargoAtualIndex = 0;
-
-mostrarCargo();
-}
-
-async function mostrarCargo(){
-
-if(cargoAtualIndex >= cargos.length){
-    finalizarVoto();
-    return;
-}
-
-numeroAtual = "";
-candidatoAtual = null;
-
-const cargo =
-cargos[cargoAtualIndex];
-
-document
-.getElementById("cargoNome")
-.textContent = cargo.nome;
-
-document
-.getElementById("numeroDigitado")
-.textContent =
-"_".repeat(cargo.digitos);
-
-document
-.getElementById("dadosCandidato")
-.innerHTML = "";
-}
-
-async function buscarCandidato(){
-
-const cargo =
-cargos[cargoAtualIndex];
-
-if(
-numeroAtual.length !==
-cargo.digitos
-){
+if(!eleicaoId)
 return;
-}
 
-const q = query(
-collection(db,"candidatos"),
-where("eleicaoId","==",eleicaoId),
-where("cargoId","==",cargo.id),
-where("numero","==",numeroAtual)
+const q =
+query(
+collection(
+db,
+"cargos"
+),
+where(
+"eleicaoId",
+"==",
+eleicaoId
+)
 );
 
 const snap =
 await getDocs(q);
 
-if(snap.empty){
+cargos = [];
 
-candidatoAtual = null;
+snap.forEach(
+(docu)=>{
+
+cargos.push({
+id:docu.id,
+...docu.data()
+});
+});
+
+cargos.sort(
+(a,b)=>
+(a.ordem||0)
+-
+(b.ordem||0)
+);
+
+cargoAtual = 0;
+
+mostrarCargo();
+}
+
+function
+mostrarCargo(){
+
+if(
+cargoAtual >=
+cargos.length
+){
+
+finalizarVoto();
+return;
+}
+
+numeroAtual =
+"";
+
+candidatoAtual =
+null;
+
+const cargo =
+cargos[cargoAtual];
 
 document
-.getElementById("dadosCandidato")
+.getElementById(
+"cargoNome"
+)
+.textContent =
+cargo.nome;
+
+document
+.getElementById(
+"numeroDigitado"
+)
+.textContent =
+"_".repeat(
+cargo.digitos
+);
+
+document
+.getElementById(
+"dadosCandidato"
+)
+.innerHTML =
+"";
+}
+
+async function
+buscarCandidato(){
+
+const cargo =
+cargos[cargoAtual];
+
+if(
+numeroAtual
+.length
+!== cargo.digitos
+){
+return;
+}
+
+const q =
+query(
+collection(
+db,
+"candidatos"
+),
+where(
+"eleicaoId",
+"==",
+eleicaoId
+),
+where(
+"cargoId",
+"==",
+cargo.id
+),
+where(
+"numero",
+"==",
+numeroAtual
+)
+);
+
+const snap =
+await getDocs(q);
+
+if(
+snap.empty
+){
+
+candidatoAtual =
+null;
+
+document
+.getElementById(
+"dadosCandidato"
+)
 .innerHTML =
 `
-<h2 style="color:red">
-CANDIDATO NÃO ENCONTRADO
+<h2 style="
+color:red;
+">
+CANDIDATO
+NÃO
+ENCONTRADO
 </h2>
 `;
 
 return;
 }
 
-const docu =
+const cand =
 snap.docs[0];
 
 candidatoAtual = {
-id:docu.id,
-...docu.data()
+id:cand.id,
+...cand.data()
 };
 
 document
-.getElementById("dadosCandidato")
+.getElementById(
+"dadosCandidato"
+)
 .innerHTML =
 `
 <img src="${
-candidatoAtual.foto || ''
+candidatoAtual.foto || ""
 }">
 
 <div>
-<div class="nomeCand">
-${candidatoAtual.nome}
+
+<div class="
+nomeCand
+">
+${
+candidatoAtual.nome
+}
 </div>
 
-<div class="partido">
-${candidatoAtual.partido || ""}
+<div class="
+partido
+">
+${
+candidatoAtual.partido || ""
+}
 </div>
+
 </div>
 `;
 }
 
-async function confirmarVoto(){
+async function
+confirmarVoto(){
 
-if(!candidatoAtual){
+if(
+!candidatoAtual
+){
 return;
 }
 
 const cargo =
-cargos[cargoAtualIndex];
+cargos[cargoAtual];
 
 await addDoc(
-collection(db,"votos"),
+collection(
+db,
+"votos"
+),
 {
 eleicaoId,
-cargoId:cargo.id,
-cargoNome:cargo.nome,
+cargoId:
+cargo.id,
+cargoNome:
+cargo.nome,
 candidatoId:
 candidatoAtual.id,
 candidato:
@@ -479,17 +676,19 @@ candidatoAtual.nome,
 numero:
 candidatoAtual.numero,
 matricula,
-timestamp:Date.now()
+timestamp:
+Date.now()
 }
 );
 
-cargoAtualIndex++;
+cargoAtual++;
 
 mostrarCargo();
 }
 
 async function finalizarVoto(){
 
+// marca matrícula usada
 await setDoc(
 doc(
 db,
@@ -499,12 +698,15 @@ matricula
 {
 usada:true,
 eleicaoId,
-timestamp:Date.now()
+timestamp:
+Date.now()
 }
 );
 
+// limpar mensagem
 await setDoc(
-doc(db,
+doc(
+db,
 "sistema",
 "controle"
 ),
@@ -516,91 +718,147 @@ merge:true
 }
 );
 
+// esconder votação
 votacaoScreen
 .classList
-.remove("active");
+.remove(
+"active"
+);
 
-finalScreen
+// mostrar fim
+fimScreen
 .classList
-.add("active");
+.add(
+"active"
+);
 
+// tocar som
+document
+.getElementById(
+"somFim"
+)
+.play();
+
+// voltar ao início
 setTimeout(()=>{
 
-finalScreen
+fimScreen
 .classList
-.remove("active");
+.remove(
+"active"
+);
 
-matriculaScreen
-.classList
-.add("active");
-
-matriculaInput
-.value="";
-
-matricula="";
-estado=
-"matricula";
+resetarUrna();
 
 },3000);
 }
 
 function resetarUrna(){
 
-estado = "senha";
+estado =
+"senha";
 
-senhaDigitada = "";
-matricula = "";
-numeroAtual = "";
+senhaDigitada =
+"";
 
-senhaInput.value="";
-matriculaInput.value="";
+matricula =
+"";
+
+numeroAtual =
+"";
+
+candidatoAtual =
+null;
+
+cargoAtual =
+0;
+
+senhaInput
+.value =
+"";
+
+matriculaInput
+.value =
+"";
+
+document
+.getElementById(
+"dadosCandidato"
+)
+.innerHTML =
+"";
+
+document
+.getElementById(
+"numeroDigitado"
+)
+.textContent =
+"__";
 
 bloqueada
 .classList
-.add("active");
+.add(
+"active"
+);
 
 matriculaScreen
 .classList
-.remove("active");
+.remove(
+"active"
+);
 
 votacaoScreen
 .classList
-.remove("active");
+.remove(
+"active"
+);
 
-finalScreen
+fimScreen
 .classList
-.remove("active");
+.remove(
+"active"
+);
 }
 
 // teclado físico
-window.addEventListener(
+document
+.addEventListener(
 "keydown",
 async (e)=>{
 
+e.preventDefault();
+
+// números
 if(
 /^[0-9]$/
 .test(e.key)
 ){
 
-// SENHA
+// senha
 if(
-estado==="senha"
+estado
+===
+"senha"
 ){
 
 if(
-senhaDigitada.length<4
+senhaDigitada
+.length
+< 4
 ){
 
 senhaDigitada +=
 e.key;
 
-senhaInput.value =
+senhaInput
+.value =
 senhaDigitada;
 }
 
 if(
 senhaDigitada
-.length===4
+.length
+=== 4
 ){
 
 const snap =
@@ -616,7 +874,8 @@ const dados =
 snap.data();
 
 if(
-dados.codigo ===
+dados.codigo
+===
 senhaDigitada
 ){
 
@@ -637,24 +896,40 @@ matriculaScreen
 
 }else{
 
-erroSenha
+document
+.getElementById(
+"erroSenha"
+)
 .textContent =
 "SENHA INVÁLIDA";
 
-setTimeout(()=>{
-erroSenha
-.textContent="";
-},2000);
+setTimeout(
+()=>{
 
-senhaDigitada="";
-senhaInput.value="";
+document
+.getElementById(
+"erroSenha"
+)
+.textContent =
+"";
+
+},2000
+);
+
+senhaDigitada =
+"";
+
+senhaInput
+.value =
+"";
 }
 }
 }
 
-// MATRICULA
+// matrícula
 else if(
-estado===
+estado
+===
 "matricula"
 ){
 
@@ -666,19 +941,22 @@ matriculaInput
 matricula;
 }
 
-// VOTAÇÃO
+// votação
 else if(
-estado===
+estado
+===
 "votacao"
 ){
 
 const cargo =
 cargos[
-cargoAtualIndex
+cargoAtual
 ];
 
 if(
-numeroAtual.length <
+numeroAtual
+.length
+<
 cargo.digitos
 ){
 
@@ -697,13 +975,16 @@ buscarCandidato();
 }
 }
 
-// BACKSPACE
+// apagar
 if(
-e.key==="Backspace"
+e.key
+===
+"Backspace"
 ){
 
 if(
-estado===
+estado
+===
 "matricula"
 ){
 
@@ -712,12 +993,13 @@ matricula
 .slice(0,-1);
 
 matriculaInput
-.value=
+.value =
 matricula;
 }
 
 if(
-estado===
+estado
+===
 "votacao"
 ){
 
@@ -734,22 +1016,29 @@ numeroAtual;
 }
 }
 
-// .
+// corrige
 if(
-e.key==="."
+e.key
+===
+"."
 &&
-estado===
+estado
+===
 "votacao"
 ){
 
-numeroAtual="";
-candidatoAtual=null;
+numeroAtual =
+"";
+
+candidatoAtual =
+null;
 
 document
 .getElementById(
 "dadosCandidato"
 )
-.innerHTML="";
+.innerHTML =
+"";
 
 document
 .getElementById(
@@ -758,24 +1047,27 @@ document
 .textContent =
 "_".repeat(
 cargos[
-cargoAtualIndex
+cargoAtual
 ]
 .digitos
 );
 }
 
-// ENTER
+// enter
 if(
-e.key==="Enter"
+e.key
+===
+"Enter"
 ){
 
-// confirmar matricula
+// matrícula
 if(
-estado===
+estado
+===
 "matricula"
 ){
 
-const snap =
+const usado =
 await getDoc(
 doc(
 db,
@@ -785,12 +1077,15 @@ matricula
 );
 
 if(
-snap.exists()
+usado.exists()
 ){
 
-erroMatricula
+document
+.getElementById(
+"erroMatricula"
+)
 .textContent =
-"ESTA MATRÍCULA JÁ FOI UTILIZADA";
+"MATRÍCULA JÁ UTILIZADA";
 
 return;
 }
@@ -810,41 +1105,32 @@ votacaoScreen
 "active"
 );
 
-await carregarCargos();
+await
+carregarCargos();
 }
 
-// confirmar voto
+// voto
 else if(
-estado===
+estado
+===
 "votacao"
 ){
+
 confirmarVoto();
 }
 }
-
 });
 
-// iniciar câmera
-try{
+document
+.body
+.focus();
 
-const stream =
-await navigator
-.mediaDevices
-.getUserMedia({
-video:true,
-audio:false
-});
-
-console.log(
-"camera iniciada",
-stream
-);
-
-// WebRTC entra aqui
-
-}catch(err){
-console.error(err);
-}
+window.onclick =
+()=>{
+document
+.body
+.focus();
+};
 
 </script>
 </body>
