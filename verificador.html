@@ -656,6 +656,13 @@ document
 .onclick =
 async ()=>{
 
+if(!eleicaoAtual){
+alert(
+"Crie uma eleição primeiro"
+);
+return;
+}
+
 const codigo =
 gerar4();
 
@@ -674,7 +681,9 @@ db,
 ),
 {
 codigo,
-travada:false
+travada:false,
+eleicaoAtiva:
+eleicaoAtual
 },
 {
 merge:true
@@ -709,7 +718,7 @@ alert(
 );
 };
 
-// enviar mensagem
+// mensagem da urna
 document
 .getElementById(
 "enviarMensagem"
@@ -761,7 +770,7 @@ alert(
 return;
 }
 
-// trava tudo
+// trava urnas
 await setDoc(
 doc(
 db,
@@ -779,7 +788,7 @@ merge:true
 }
 );
 
-// reativar matrículas
+// limpar matrículas
 const mats =
 await getDocs(
 collection(
@@ -839,25 +848,38 @@ collection(
 db,
 "votos"
 ),
-(snapshot)=>{
+async (snapshot)=>{
 
-getDoc(
+// sem eleição
+if(
+!eleicaoAtual
+){
+return;
+}
+
+// pegar eleição
+const eleicao =
+await getDoc(
 doc(
 db,
 "eleicoes",
 eleicaoAtual
 )
-)
-.then((eleicao)=>{
+);
 
 if(
 !eleicao.exists()
-) return;
+){
+return;
+}
 
 const modo =
-eleicao.data()
+eleicao
+.data()
 .modo;
 
+// só mostrar
+// se for tempo real
 if(
 modo
 !==
@@ -867,10 +889,14 @@ return;
 }
 
 let html =
-"<h2>Votos</h2>";
+`
+<h2>
+Votos
+</h2>
+`;
 
-snapshot
-.docs
+// montar lista
+snapshot.docs
 .filter(docu=>
 docu.data()
 .eleicaoId
@@ -885,23 +911,31 @@ docu.data();
 html +=
 `
 <div class="item">
+
+<b>
 ${voto.cargoNome}
+</b>
+
 <br>
+
 ${voto.candidato}
-(
-${voto.numero}
-)
+
+(${voto.numero})
+
 </div>
 `;
 });
 
+// criar box
 let box =
 document
 .getElementById(
 "votosTempoReal"
 );
 
-if(!box){
+if(
+!box
+){
 
 box =
 document
@@ -926,8 +960,6 @@ box
 
 box.innerHTML =
 html;
-
-});
 });
 
 </script>
