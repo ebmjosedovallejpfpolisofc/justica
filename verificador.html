@@ -1,249 +1,934 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Verificador da Urna</title>
+<meta charset="UTF-8">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Verificador</title>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#ececec;padding:20px}
-.container{display:grid;grid-template-columns:380px 1fr;gap:20px}
-.card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 5px 20px rgba(0,0,0,.12)}
-h1{margin-bottom:15px}
-input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #ccc;margin-top:8px;margin-bottom:12px}
-button{cursor:pointer;font-weight:bold}
-.codigo{font-size:42px;text-align:center;background:#f5f5f5;padding:20px;border-radius:16px;letter-spacing:10px;margin-bottom:12px}
-video{width:100%;border-radius:18px;background:#000}
-.lista{max-height:250px;overflow:auto;border:1px solid #ddd;padding:10px;border-radius:12px}
-.item{padding:10px;border-bottom:1px solid #eee}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#ececec;
+padding:20px;
+}
+
+.container{
+max-width:1300px;
+margin:auto;
+display:grid;
+grid-template-columns:
+1fr 1fr;
+gap:20px;
+}
+
+.card{
+background:white;
+border-radius:16px;
+padding:20px;
+box-shadow:
+0 5px 20px rgba(0,0,0,.15);
+}
+
+h1{
+margin-bottom:15px;
+}
+
+input,
+select,
+button,
+textarea{
+width:100%;
+padding:14px;
+margin-top:10px;
+border-radius:10px;
+border:2px solid #ccc;
+font-size:16px;
+}
+
+button{
+cursor:pointer;
+font-weight:bold;
+}
+
+.lista{
+margin-top:20px;
+border:2px solid #ddd;
+border-radius:10px;
+padding:10px;
+max-height:250px;
+overflow:auto;
+}
+
+.item{
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+.codigo{
+font-size:50px;
+font-weight:bold;
+text-align:center;
+margin-top:15px;
+letter-spacing:10px;
+}
+
+.votos{
+margin-top:20px;
+}
+
 </style>
 </head>
 <body>
+
 <div class="container">
-  <div class="card">
-    <h1>VERIFICADOR</h1>
 
-    <label>Eleição ativa</label>
-    <select id="eleicaoSelect"></select>
+<div class="card">
 
-    <button id="ativarEleicao">ATIVAR ELEIÇÃO</button>
+<h1>Criar Eleição</h1>
 
-    <hr style="margin:16px 0">
+<input
+id="nomeEleicao"
+placeholder="Nome da eleição"
+/>
 
-    <h3>Código de liberação</h3>
-    <div id="codigo" class="codigo">----</div>
-    <button id="gerarCodigo">GERAR NOVO CÓDIGO</button>
-    <button id="travarUrnas">TRAVAR URNAS</button>
+<select id="modoResultado">
+<option value="tempoReal">
+Mostrar votos em tempo real
+</option>
 
-    <hr style="margin:16px 0">
+<option value="final">
+Mostrar só no final
+</option>
+</select>
 
-    <h3>Mensagem da urna</h3>
-    <input id="mensagem" placeholder="Ex: João, sua vez de votar" />
-    <button id="enviarMensagem">ENVIAR MENSAGEM</button>
+<button id="criarEleicao">
+CRIAR ELEIÇÃO
+</button>
 
-    <hr style="margin:16px 0">
+</div>
 
-    <h3>Criar eleição</h3>
-    <input id="nomeEleicao" placeholder="Nome da eleição" />
-    <input id="tituloUrna" placeholder="Título da urna" />
+<div class="card">
 
-    <label>Resultados</label>
-    <select id="modoResultados">
-      <option value="true">Em tempo real</option>
-      <option value="false">Somente ao finalizar</option>
-    </select>
+<h1>Controle</h1>
 
-    <button id="criarEleicao">CRIAR ELEIÇÃO</button>
+<div
+id="codigo"
+class="codigo">
+----
+</div>
 
-    <h3>Cargos</h3>
-    <input id="cargoNome" placeholder="Nome do cargo" />
-    <input id="cargoDigitos" type="number" placeholder="Qtd. dígitos" />
-    <button id="adicionarCargo">ADICIONAR CARGO</button>
+<button id="gerarCodigo">
+GERAR CÓDIGO
+</button>
 
-    <div id="listaCargos" class="lista"></div>
+<button id="travarUrnas">
+TRAVAR URNAS
+</button>
 
-    <h3>Candidatos</h3>
-    <input id="candNome" placeholder="Nome do candidato" />
-    <input id="candNumero" placeholder="Número do candidato" />
-    <input id="candPartido" placeholder="Partido/Sigla" />
-    <input id="candFoto" placeholder="URL da foto" />
-    <select id="cargoCandidato"></select>
+<button id="encerrarVotacao">
+ENCERRAR VOTAÇÃO
+</button>
 
-    <button id="adicionarCandidato">ADICIONAR CANDIDATO</button>
-  </div>
+<textarea
+id="mensagem"
+placeholder="Mensagem da urna">
+</textarea>
 
-  <div class="card">
-    <h1>Câmera da urna (ao vivo)</h1>
-    <video id="videoRemoto" autoplay playsinline></video>
+<button id="enviarMensagem">
+ENVIAR MENSAGEM
+</button>
 
-    <hr style="margin:16px 0">
+</div>
 
-    <h2>Resultados</h2>
-    <div id="resultados"></div>
-  </div>
+<div class="card">
+
+<h1>Cargos</h1>
+
+<input
+id="cargoNome"
+placeholder="Nome do cargo"
+/>
+
+<input
+id="cargoDigitos"
+type="number"
+placeholder="Qtd de dígitos"
+/>
+
+<button id="addCargo">
+ADICIONAR CARGO
+</button>
+
+<div
+id="listaCargos"
+class="lista">
+</div>
+
+</div>
+
+<div class="card">
+
+<h1>Candidatos</h1>
+
+<input
+id="candNome"
+placeholder="Nome"
+/>
+
+<input
+id="candNumero"
+placeholder="Número"
+/>
+
+<input
+id="candPartido"
+placeholder="Partido"
+/>
+
+<input
+id="candFoto"
+placeholder="URL da foto"
+/>
+
+<select
+id="cargoSelect">
+</select>
+
+<button id="addCandidato">
+ADICIONAR
+</button>
+
+<div
+id="listaCand"
+class="lista">
+</div>
+
+</div>
+
 </div>
 
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js';
+
+import {
+initializeApp
+}
+from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
 import {
 getFirestore,
 collection,
 addDoc,
 doc,
 setDoc,
-getDocs,
 getDoc,
-updateDoc,
-onSnapshot,
+getDocs,
+deleteDoc,
 query,
-where
-} from 'https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js';
+where,
+onSnapshot
+}
+from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBS9T8rTIa_xDTX0TYrXx27GosNnnKQZgQ',
-  authDomain: 'urna-digitall.firebaseapp.com',
-  projectId: 'urna-digitall',
-  storageBucket: 'urna-digitall.firebasestorage.app',
-  messagingSenderId: '483657741450',
-  appId: '1:483657741450:web:4b1dc7da83fe2730f2a973'
+
+apiKey:
+"AIzaSyBS9T8rTIa_xDTX0TYrXx27GosNnnKQZgQ",
+
+authDomain:
+"urna-digitall.firebaseapp.com",
+
+projectId:
+"urna-digitall",
+
+storageBucket:
+"urna-digitall.firebasestorage.app",
+
+messagingSenderId:
+"483657741450",
+
+appId:
+"1:483657741450:web:4b1dc7da83fe2730f2a973"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const app =
+initializeApp(
+firebaseConfig
+);
 
-let eleicaoAtual = null;
-let cargosTemp = [];
+const db =
+getFirestore(app);
 
-const codigoEl = document.getElementById('codigo');
+let eleicaoAtual =
+"";
 
-function gerarCodigo4() {
-  return Math.floor(1000 + Math.random() * 9000).toString();
+function gerar4(){
+
+return Math.floor(
+1000 +
+Math.random()*9000
+).toString();
 }
 
-async function carregarEleicoes() {
-  const select = document.getElementById('eleicaoSelect');
-  select.innerHTML = '';
+// criar eleição
+document
+.getElementById(
+"criarEleicao"
+)
+.onclick =
+async ()=>{
 
-  const snap = await getDocs(collection(db,'eleicoes'));
-  snap.forEach(docu => {
-    const op = document.createElement('option');
-    op.value = docu.id;
-    op.textContent = docu.data().nome;
-    select.appendChild(op);
-  });
+const nome =
+document
+.getElementById(
+"nomeEleicao"
+)
+.value
+.trim();
+
+if(!nome){
+alert(
+"Digite o nome da eleição"
+);
+return;
 }
 
-await carregarEleicoes();
+const modo =
+document
+.getElementById(
+"modoResultado"
+)
+.value;
 
-// Criar eleição
-criarEleicao.onclick = async () => {
-  const nome = nomeEleicao.value.trim();
-  const titulo = tituloUrna.value.trim();
-  const tempoReal = modoResultados.value === 'true';
+const ref =
+await addDoc(
+collection(
+db,
+"eleicoes"
+),
+{
+nome,
+modo,
+ativa:true,
+encerrada:false,
+criadaEm:
+Date.now()
+}
+);
 
-  const ref = await addDoc(collection(db,'eleicoes'),{
-    nome,
-    titulo,
-    ativa:false,
-    encerrada:false,
-    mostrarResultadosTempoReal: tempoReal,
-    criadoEm: Date.now()
-  });
+eleicaoAtual =
+ref.id;
 
-  eleicaoAtual = ref.id;
-  alert('Eleição criada');
-  carregarEleicoes();
+// ativa eleição
+await setDoc(
+doc(
+db,
+"sistema",
+"controle"
+),
+{
+eleicaoAtiva:
+eleicaoAtual,
+travada:true,
+mensagem:"",
+codigo:""
+},
+{
+merge:true
+}
+);
+
+alert(
+"Eleição criada"
+);
 };
 
-// Cargo
-adicionarCargo.onclick = async () => {
-  if(!eleicaoAtual) return alert('Crie uma eleição primeiro');
+// adicionar cargo
+document
+.getElementById(
+"addCargo"
+)
+.onclick =
+async ()=>{
 
-  const nome = cargoNome.value;
-  const digitos = Number(cargoDigitos.value);
+if(
+!eleicaoAtual
+){
+alert(
+"Crie a eleição primeiro"
+);
+return;
+}
 
-  const ref = await addDoc(collection(db,'cargos'),{
-    eleicaoId: eleicaoAtual,
-    nome,
-    digitos,
-    ordem: cargosTemp.length + 1
-  });
+const nome =
+document
+.getElementById(
+"cargoNome"
+)
+.value
+.trim();
 
-  cargosTemp.push({id:ref.id,nome});
+const digitos =
+parseInt(
+document
+.getElementById(
+"cargoDigitos"
+)
+.value
+);
 
-  listaCargos.innerHTML += `<div class="item">${nome} (${digitos} dígitos)</div>`;
+if(
+!nome ||
+!digitos
+){
+alert(
+"Preencha tudo"
+);
+return;
+}
 
-  const option = document.createElement('option');
-  option.value = ref.id;
-  option.textContent = nome;
-  cargoCandidato.appendChild(option);
+await addDoc(
+collection(
+db,
+"cargos"
+),
+{
+eleicaoId:
+eleicaoAtual,
+nome,
+digitos,
+ordem:
+Date.now()
+}
+);
+
+document
+.getElementById(
+"cargoNome"
+)
+.value =
+"";
+
+document
+.getElementById(
+"cargoDigitos"
+)
+.value =
+"";
 };
 
-// Candidato
-adicionarCandidato.onclick = async () => {
-  if(!eleicaoAtual) return alert('Crie uma eleição');
+// listar cargos
+onSnapshot(
+collection(
+db,
+"cargos"
+),
+(snapshot)=>{
 
-  await addDoc(collection(db,'candidatos'),{
-    eleicaoId: eleicaoAtual,
-    cargoId: cargoCandidato.value,
-    nome: candNome.value,
-    numero: candNumero.value,
-    partido: candPartido.value,
-    foto: candFoto.value
-  });
+const lista =
+document
+.getElementById(
+"listaCargos"
+);
 
-  alert('Candidato adicionado');
-};
+const select =
+document
+.getElementById(
+"cargoSelect"
+);
 
-// Ativar eleição
-ativarEleicao.onclick = async () => {
-  const id = eleicaoSelect.value;
+lista.innerHTML =
+"";
 
-  await setDoc(doc(db,'sistema','controle'),{
-    eleicaoAtiva:id
-  }, {merge:true});
+select.innerHTML =
+"";
 
-  alert('Eleição ativada');
-};
+snapshot
+.docs
+.filter(docu=>
+docu.data()
+.eleicaoId
+===
+eleicaoAtual
+)
+.forEach(docu=>{
 
-// Código
-gerarCodigo.onclick = async () => {
-  const codigo = gerarCodigo4();
-  codigoEl.textContent = codigo;
+const data =
+docu.data();
 
-  await setDoc(doc(db,'sistema','controle'),{
-    codigo,
-    travada:false
-  },{merge:true});
-};
+lista.innerHTML +=
+`
+<div class="item">
+${data.nome}
+(${data.digitos}
+dígitos)
+</div>
+`;
 
-// Travar
-travarUrnas.onclick = async () => {
-  await setDoc(doc(db,'sistema','controle'),{
-    travada:true
-  },{merge:true});
-};
-
-// Mensagem
-enviarMensagem.onclick = async () => {
-  await setDoc(doc(db,'sistema','controle'),{
-    mensagem: mensagem.value
-  },{merge:true});
-};
-
-// Resultados em tempo real
-onSnapshot(collection(db,'votos'), async (snap) => {
-  const box = document.getElementById('resultados');
-  box.innerHTML = `<h3>Total de votos: ${snap.size}</h3>`;
+select.innerHTML +=
+`
+<option
+value="${docu.id}">
+${data.nome}
+</option>
+`;
+});
 });
 
-// WebRTC base (receber stream)
-const videoRemoto = document.getElementById('videoRemoto');
-const remoteStream = new MediaStream();
-videoRemoto.srcObject = remoteStream;
+// adicionar candidato
+document
+.getElementById(
+"addCandidato"
+)
+.onclick =
+async ()=>{
 
-// Aqui entrará a conexão WebRTC completa
-// recebendo vídeo da urna.html
+if(
+!eleicaoAtual
+){
+alert(
+"Crie eleição"
+);
+return;
+}
+
+const nome =
+document
+.getElementById(
+"candNome"
+)
+.value
+.trim();
+
+const numero =
+document
+.getElementById(
+"candNumero"
+)
+.value
+.trim();
+
+const partido =
+document
+.getElementById(
+"candPartido"
+)
+.value
+.trim();
+
+const foto =
+document
+.getElementById(
+"candFoto"
+)
+.value
+.trim();
+
+const cargoId =
+document
+.getElementById(
+"cargoSelect"
+)
+.value;
+
+if(
+!nome ||
+!numero ||
+!cargoId
+){
+alert(
+"Preencha tudo"
+);
+return;
+}
+
+await addDoc(
+collection(
+db,
+"candidatos"
+),
+{
+eleicaoId:
+eleicaoAtual,
+cargoId,
+nome,
+numero,
+partido,
+foto
+}
+);
+
+document
+.getElementById(
+"candNome"
+)
+.value =
+"";
+
+document
+.getElementById(
+"candNumero"
+)
+.value =
+"";
+
+document
+.getElementById(
+"candPartido"
+)
+.value =
+"";
+
+document
+.getElementById(
+"candFoto"
+)
+.value =
+"";
+};
+
+// listar candidatos
+onSnapshot(
+collection(
+db,
+"candidatos"
+),
+(snapshot)=>{
+
+const lista =
+document
+.getElementById(
+"listaCand"
+);
+
+lista.innerHTML =
+"";
+
+snapshot
+.docs
+.filter(docu=>
+docu.data()
+.eleicaoId
+===
+eleicaoAtual
+)
+.forEach(docu=>{
+
+const data =
+docu.data();
+
+lista.innerHTML +=
+`
+<div class="item">
+<b>
+${data.nome}
+</b>
+
+<br>
+
+Número:
+${data.numero}
+
+<br>
+
+${data.partido || ""}
+</div>
+`;
+});
+});
+
+// gerar código
+document
+.getElementById(
+"gerarCodigo"
+)
+.onclick =
+async ()=>{
+
+const codigo =
+gerar4();
+
+document
+.getElementById(
+"codigo"
+)
+.textContent =
+codigo;
+
+await setDoc(
+doc(
+db,
+"sistema",
+"controle"
+),
+{
+codigo,
+travada:false
+},
+{
+merge:true
+}
+);
+};
+
+// travar urnas
+document
+.getElementById(
+"travarUrnas"
+)
+.onclick =
+async ()=>{
+
+await setDoc(
+doc(
+db,
+"sistema",
+"controle"
+),
+{
+travada:true
+},
+{
+merge:true
+}
+);
+
+alert(
+"Urnas travadas"
+);
+};
+
+// enviar mensagem
+document
+.getElementById(
+"enviarMensagem"
+)
+.onclick =
+async ()=>{
+
+const texto =
+document
+.getElementById(
+"mensagem"
+)
+.value
+.trim();
+
+await setDoc(
+doc(
+db,
+"sistema",
+"controle"
+),
+{
+mensagem:texto
+},
+{
+merge:true
+}
+);
+
+alert(
+"Mensagem enviada"
+);
+};
+
+// encerrar votação
+document
+.getElementById(
+"encerrarVotacao"
+)
+.onclick =
+async ()=>{
+
+if(
+!eleicaoAtual
+){
+alert(
+"Sem eleição ativa"
+);
+return;
+}
+
+// trava tudo
+await setDoc(
+doc(
+db,
+"sistema",
+"controle"
+),
+{
+travada:true,
+mensagem:"",
+eleicaoAtiva:"",
+codigo:""
+},
+{
+merge:true
+}
+);
+
+// reativar matrículas
+const mats =
+await getDocs(
+collection(
+db,
+"matriculas"
+)
+);
+
+for(
+const mat of
+mats.docs
+){
+
+const data =
+mat.data();
+
+if(
+data.eleicaoId
+===
+eleicaoAtual
+){
+
+await deleteDoc(
+doc(
+db,
+"matriculas",
+mat.id
+)
+);
+}
+}
+
+// encerrar eleição
+await setDoc(
+doc(
+db,
+"eleicoes",
+eleicaoAtual
+),
+{
+encerrada:true,
+ativa:false
+},
+{
+merge:true
+}
+);
+
+alert(
+"Votação encerrada"
+);
+};
+
+// votos tempo real
+onSnapshot(
+collection(
+db,
+"votos"
+),
+(snapshot)=>{
+
+getDoc(
+doc(
+db,
+"eleicoes",
+eleicaoAtual
+)
+)
+.then((eleicao)=>{
+
+if(
+!eleicao.exists()
+) return;
+
+const modo =
+eleicao.data()
+.modo;
+
+if(
+modo
+!==
+"tempoReal"
+){
+return;
+}
+
+let html =
+"<h2>Votos</h2>";
+
+snapshot
+.docs
+.filter(docu=>
+docu.data()
+.eleicaoId
+===
+eleicaoAtual
+)
+.forEach(docu=>{
+
+const voto =
+docu.data();
+
+html +=
+`
+<div class="item">
+${voto.cargoNome}
+<br>
+${voto.candidato}
+(
+${voto.numero}
+)
+</div>
+`;
+});
+
+let box =
+document
+.getElementById(
+"votosTempoReal"
+);
+
+if(!box){
+
+box =
+document
+.createElement(
+"div"
+);
+
+box.id =
+"votosTempoReal";
+
+box.className =
+"card votos";
+
+document
+.querySelector(
+".container"
+)
+.appendChild(
+box
+);
+}
+
+box.innerHTML =
+html;
+
+});
+});
 
 </script>
 </body>
